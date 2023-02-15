@@ -1,17 +1,22 @@
+import 'package:fake_image_detector/main.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import "dart:io";
 import "package:image_picker/image_picker.dart";
 import "package:http/http.dart" as http;
 import "dart:convert";
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'userHistory.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
-class WorkFlow1 extends StatefulWidget {
+class WorkFlowUser extends StatefulWidget {
+  User user;
+  WorkFlowUser({this.user});
   @override
-  State<WorkFlow1> createState() => _WorkFlow1State();
+  State<WorkFlowUser> createState() => _WorkFlowUserState();
 }
 
-class _WorkFlow1State extends State<WorkFlow1> {
+class _WorkFlowUserState extends State<WorkFlowUser> {
   File _image;
   bool showSpinner = false;
   bool isVisible = false;
@@ -101,6 +106,13 @@ class _WorkFlow1State extends State<WorkFlow1> {
     });
   }
 
+  Future signOut() async {
+    await GoogleSignIn().signOut();
+    await FirebaseAuth.instance.signOut();
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => FakeImageDetectorFrontPage()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
@@ -108,21 +120,80 @@ class _WorkFlow1State extends State<WorkFlow1> {
       child: Scaffold(
           backgroundColor: Colors.yellowAccent,
           appBar: AppBar(
-              backgroundColor: Colors.green[900],
-              title: Text("Deep Fake Detector")),
+            backgroundColor: Colors.green[900],
+            title: Text("Deep Fake Detector"),
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  signOut();
+                },
+                icon: Icon(
+                  Icons.logout,
+                  color: Colors.orange,
+                ),
+              )
+            ],
+          ),
           body: Column(
             children: <Widget>[
+              // Text(widget.user.email),
+              // Text(widget.user.uid),
               SizedBox(
                 height: 40,
               ),
-              Container(
-                child: Text("Picture Upload Section",
-                    style: TextStyle(fontSize: 20)),
-                //margin: const EdgeInsets.all(10.0),
-                padding: const EdgeInsets.all(10.0),
-                decoration:
-                    BoxDecoration(border: Border.all(color: Colors.brown)),
-              ),
+              Row(children: <Widget>[
+                Container(
+                  margin: const EdgeInsets.fromLTRB(35.0, 20.0, 20.0, 20.0),
+                  //  padding: const EdgeInsets.all(10.0),
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.brown[900],
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ),
+                    child: Container(
+                      child: Text(
+                        'Save Records',
+                        style: TextStyle(color: Colors.red[50], fontSize: 20),
+                      ),
+                    ),
+                  ),
+                ),
+                /* Container(
+                  child: Text("Upload Section", style: TextStyle(fontSize: 20)),
+                  //margin: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(10.0),
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.brown)),
+                ), */
+
+                Container(
+                  margin: const EdgeInsets.all(20.0),
+                  //  padding: const EdgeInsets.all(10.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UserHistory(
+                                    user: widget.user,
+                                  )));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.brown[900],
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ),
+                    child: Container(
+                      child: Text(
+                        'User History',
+                        style: TextStyle(color: Colors.red[50], fontSize: 20),
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
               SizedBox(
                 height: 10,
               ),

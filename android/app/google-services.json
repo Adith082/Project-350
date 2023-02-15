@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "610407661767",
+    "project_id": "deep-fake-detector-a793f",
+    "storage_bucket": "deep-fake-detector-a793f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:610407661767:android:86148fcc0b43eb3d787ee2",
+        "android_client_info": {
+          "package_name": "com.example.fake_image_detector"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "610407661767-q645qnfv1k7mk662fav68t6qdbrtmm3j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fake_image_detector",
+            "certificate_hash": "25ef743e56841c7b8326cf126e9d195340e7df3a"
+          }
+        },
+        {
+          "client_id": "610407661767-rdu0et6ub5r4lm5ocu7klei2l8spkqc3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHvlCboHsDwFDn9INll89vSMx6ibUVeCQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "610407661767-0lijvsl4qarj9jcce9qui6a530t9gsns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

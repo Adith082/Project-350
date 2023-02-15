@@ -1,7 +1,16 @@
+import 'package:fake_image_detector/modelChoice1.dart';
+import 'package:fake_image_detector/modelChoiceUser.dart';
+import 'package:fake_image_detector/workFlowUser.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'workFlow1.dart';
+import 'package:firebase_core/firebase_core.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -9,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: TomatoBlightDetectorFrontPage(),
+      home: FakeImageDetectorFrontPage(),
       theme: ThemeData(
         primarySwatch: Colors.red,
         fontFamily: "Bangers",
@@ -18,7 +27,39 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class TomatoBlightDetectorFrontPage extends StatelessWidget {
+class FakeImageDetectorFrontPage extends StatefulWidget {
+  @override
+  _FakeImageDetectorFrontPageState createState() =>
+      _FakeImageDetectorFrontPageState();
+}
+
+class _FakeImageDetectorFrontPageState
+    extends State<FakeImageDetectorFrontPage> {
+  Future signIn() async {
+    print(
+        "ARRRRRRRRRRRRRRRRRRRRRRR YOUUUUUUUUUUUUUUUUUUUUUU THERE !!!!!!!!!!!!!!");
+
+    final GoogleSignInAccount googleSignInAccount =
+        await GoogleSignIn().signIn();
+    final GoogleSignInAuthentication googleSignInAuthentication =
+        await googleSignInAccount.authentication;
+    AuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleSignInAuthentication.idToken,
+        accessToken: googleSignInAuthentication.accessToken);
+    UserCredential result =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+    User user = result.user;
+    print(" not moving to other page");
+    if (user != null) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ModelChoiceUser(
+                    user: user,
+                  )));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +73,7 @@ class TomatoBlightDetectorFrontPage extends StatelessWidget {
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+        children: <Widget>[
           Container(
               width: 300,
               decoration:
@@ -65,7 +106,7 @@ class TomatoBlightDetectorFrontPage extends StatelessWidget {
             // padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(border: Border.all(color: Colors.brown)),
             child: Text(
-              'We will assist you detecting late blight and early blight , a common disease that defects tomato plants. Simply upload a picture of your tomato plant leaf and let me do the rest!',
+              'We will assist you detecting deep fake images , Users logging with account can will have the privilege to save images with prediction information too which can be viewed as history for that user',
               // style: Theme.of(context).textTheme.bodyText1,
               style: TextStyle(
                   //  fontWeight: FontWeight.bold,
@@ -77,10 +118,25 @@ class TomatoBlightDetectorFrontPage extends StatelessWidget {
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
+              signIn();
+            },
+            style: ElevatedButton.styleFrom(
+                primary: Colors.brown[900],
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+            child: Container(
+              child: Text(
+                'Sign In with Google!',
+                style: TextStyle(color: Colors.red[50], fontSize: 20),
+              ),
+            ),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => WorkFlow1(),
+                  builder: (context) => ModelChoice(),
                 ),
               );
             },
