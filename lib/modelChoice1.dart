@@ -1,3 +1,4 @@
+import 'package:fake_image_detector/workFlow2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -93,7 +94,7 @@ class _ModelChoiceState extends State<ModelChoice> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => WorkFlow1(),
+                    builder: (context) => WorkFlow2(),
                   ),
                 );
               },

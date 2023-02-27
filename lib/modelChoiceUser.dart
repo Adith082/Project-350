@@ -1,3 +1,4 @@
+import 'package:fake_image_detector/workFlowUser2.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -26,7 +27,7 @@ class _ModelChoiceUserState extends State<ModelChoiceUser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orange[100],
+      backgroundColor: Colors.orange[300],
       appBar: AppBar(
         backgroundColor: Colors.green[900],
         title: Text(
@@ -58,10 +59,11 @@ class _ModelChoiceUserState extends State<ModelChoiceUser> {
                 ),
               ],
             ),*/
-            child: Text("Choose a detector", style: TextStyle(fontSize: 35)),
+            child: Text("Choose a detector",
+                style: TextStyle(fontSize: 35, color: Colors.black)),
             margin: const EdgeInsets.fromLTRB(45, 0, 0, 0),
             padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(border: Border.all(color: Colors.brown)),
+            decoration: BoxDecoration(border: Border.all(color: Colors.black)),
           ),
           SizedBox(height: 70),
           Container(
@@ -117,7 +119,7 @@ class _ModelChoiceUserState extends State<ModelChoiceUser> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => WorkFlowUser(
+                    builder: (context) => WorkFlowUser2(
                       user: widget.user,
                     ),
                   ),

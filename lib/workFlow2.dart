@@ -6,12 +6,12 @@ import "dart:convert";
 
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
-class WorkFlow1 extends StatefulWidget {
+class WorkFlow2 extends StatefulWidget {
   @override
-  State<WorkFlow1> createState() => _WorkFlow1State();
+  State<WorkFlow2> createState() => _WorkFlow2State();
 }
 
-class _WorkFlow1State extends State<WorkFlow1> {
+class _WorkFlow2State extends State<WorkFlow2> {
   File _image;
   bool showSpinner = false;
   bool isVisible = false;
@@ -38,7 +38,7 @@ class _WorkFlow1State extends State<WorkFlow1> {
     var stream = new http.ByteStream(_image.openRead());
     stream.cast();
     var length = await _image.length();
-    var uri = Uri.parse("https://stasimus-p350-fastapi.hf.space/model1/");
+    var uri = Uri.parse("https://stasimus-p350-fastapi.hf.space/model2/");
     var request = new http.MultipartRequest("POST", uri);
     print("hello 2");
 

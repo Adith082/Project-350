@@ -1,23 +1,42 @@
+import 'package:fake_image_detector/main.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import "dart:io";
 import "package:image_picker/image_picker.dart";
 import "package:http/http.dart" as http;
 import "dart:convert";
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'userHistory.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
-class WorkFlow1 extends StatefulWidget {
+import 'package:fake_image_detector/main.dart';
+import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import "dart:io";
+import "package:image_picker/image_picker.dart";
+import "package:http/http.dart" as http;
+import "dart:convert";
+import 'package:firebase_auth/firebase_auth.dart';
+import 'userHistory.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import "package:firebase_storage/firebase_storage.dart";
+
+class WorkFlowUser2 extends StatefulWidget {
+  User user;
+  WorkFlowUser2({this.user});
   @override
-  State<WorkFlow1> createState() => _WorkFlow1State();
+  State<WorkFlowUser2> createState() => _WorkFlowUser2State();
 }
 
-class _WorkFlow1State extends State<WorkFlow1> {
+class _WorkFlowUser2State extends State<WorkFlowUser2> {
   File _image;
   bool showSpinner = false;
   bool isVisible = false;
   bool isVisible2 = true;
   var condition = "None", confidence = "None", percent = "";
   double temp = 0;
+  String imageUrl = '';
   Future UploadImage(source) async {
     var image;
     var pickedFile;
@@ -38,7 +57,7 @@ class _WorkFlow1State extends State<WorkFlow1> {
     var stream = new http.ByteStream(_image.openRead());
     stream.cast();
     var length = await _image.length();
-    var uri = Uri.parse("https://stasimus-p350-fastapi.hf.space/model1/");
+    var uri = Uri.parse("https://stasimus-p350-fastapi.hf.space/model2/");
     var request = new http.MultipartRequest("POST", uri);
     print("hello 2");
 
@@ -101,6 +120,13 @@ class _WorkFlow1State extends State<WorkFlow1> {
     });
   }
 
+  Future signOut() async {
+    await GoogleSignIn().signOut();
+    await FirebaseAuth.instance.signOut();
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => FakeImageDetectorFrontPage()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
@@ -108,21 +134,127 @@ class _WorkFlow1State extends State<WorkFlow1> {
       child: Scaffold(
           backgroundColor: Colors.yellowAccent,
           appBar: AppBar(
-              backgroundColor: Colors.green[900],
-              title: Text("Deep Fake Detector")),
+            backgroundColor: Colors.green[900],
+            title: Text("Deep Fake Detector"),
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  signOut();
+                },
+                icon: Icon(
+                  Icons.logout,
+                  color: Colors.orange,
+                ),
+              )
+            ],
+          ),
           body: Column(
             children: <Widget>[
+              // Text(widget.user.email),
+              // Text(widget.user.uid),
               SizedBox(
                 height: 40,
               ),
-              Container(
-                child: Text("Picture Upload Section",
-                    style: TextStyle(fontSize: 20)),
-                //margin: const EdgeInsets.all(10.0),
-                padding: const EdgeInsets.all(10.0),
-                decoration:
-                    BoxDecoration(border: Border.all(color: Colors.brown)),
-              ),
+              Row(children: <Widget>[
+                Container(
+                  margin: const EdgeInsets.fromLTRB(35.0, 20.0, 20.0, 20.0),
+                  //  padding: const EdgeInsets.all(10.0),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      // creating collection for each user here below
+                      CollectionReference _reference = FirebaseFirestore
+                          .instance
+                          .collection(widget.user.uid);
+                      //  String imageUrl = '';
+                      if (_image == null) return;
+                      String uniqueFileName =
+                          DateTime.now().millisecondsSinceEpoch.toString();
+
+                      // get a reference to storage root
+
+                      Reference referenceRoot = FirebaseStorage.instance.ref();
+                      Reference referenceDirImages =
+                          referenceRoot.child('images');
+                      Reference referenceImageToUpload =
+                          referenceDirImages.child(uniqueFileName);
+                      try {
+                        await referenceImageToUpload.putFile(_image);
+                        imageUrl =
+                            await referenceImageToUpload.getDownloadURL();
+                        Map<String, dynamic> dataToSend = {
+                          'condition': condition,
+                          'confidence': confidence,
+                          'imageUrl': imageUrl,
+                        };
+                        await _reference.add(dataToSend).then(
+                            (DocumentReference doc) =>
+                                print("document snapshot"));
+                      } catch (error) {}
+
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Record Saved'),
+                            actions: <Widget>[
+                              ElevatedButton(
+                                child: Text('OK'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.brown[900],
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ),
+                    child: Container(
+                      child: Text(
+                        'Save Records',
+                        style: TextStyle(color: Colors.red[50], fontSize: 20),
+                      ),
+                    ),
+                  ),
+                ),
+                /* Container(
+                  child: Text("Upload Section", style: TextStyle(fontSize: 20)),
+                  //margin: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(10.0),
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.brown)),
+                ), */
+
+                Container(
+                  margin: const EdgeInsets.all(20.0),
+                  //  padding: const EdgeInsets.all(10.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UserHistory(
+                                    user: widget.user,
+                                  )));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.brown[900],
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ),
+                    child: Container(
+                      child: Text(
+                        'User History',
+                        style: TextStyle(color: Colors.red[50], fontSize: 20),
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
               SizedBox(
                 height: 10,
               ),

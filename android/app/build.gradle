@@ -47,9 +47,9 @@ android {
         applicationId "com.example.fake_image_detector"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 19
         multiDexEnabled true
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

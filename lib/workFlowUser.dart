@@ -8,6 +8,8 @@ import "dart:convert";
 import 'package:firebase_auth/firebase_auth.dart';
 import 'userHistory.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import "package:firebase_storage/firebase_storage.dart";
 
 class WorkFlowUser extends StatefulWidget {
   User user;
@@ -23,6 +25,8 @@ class _WorkFlowUserState extends State<WorkFlowUser> {
   bool isVisible2 = true;
   var condition = "None", confidence = "None", percent = "";
   double temp = 0;
+  String imageUrl = '';
+
   Future UploadImage(source) async {
     var image;
     var pickedFile;
@@ -43,7 +47,7 @@ class _WorkFlowUserState extends State<WorkFlowUser> {
     var stream = new http.ByteStream(_image.openRead());
     stream.cast();
     var length = await _image.length();
-    var uri = Uri.parse("https://stasimus-p350-fastapi.hf.space/upimg/");
+    var uri = Uri.parse("https://stasimus-p350-fastapi.hf.space/model1/");
     var request = new http.MultipartRequest("POST", uri);
     print("hello 2");
 
@@ -146,7 +150,54 @@ class _WorkFlowUserState extends State<WorkFlowUser> {
                   margin: const EdgeInsets.fromLTRB(35.0, 20.0, 20.0, 20.0),
                   //  padding: const EdgeInsets.all(10.0),
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      // creating collection for each user here below
+                      CollectionReference _reference = FirebaseFirestore
+                          .instance
+                          .collection(widget.user.uid);
+                      //  String imageUrl = '';
+                      //    if (_image == null) return;
+                      String uniqueFileName =
+                          DateTime.now().millisecondsSinceEpoch.toString();
+
+                      // get a reference to storage root
+
+                      Reference referenceRoot = FirebaseStorage.instance.ref();
+                      Reference referenceDirImages =
+                          referenceRoot.child('images');
+                      Reference referenceImageToUpload =
+                          referenceDirImages.child(uniqueFileName);
+                      try {
+                        await referenceImageToUpload.putFile(_image);
+                        imageUrl =
+                            await referenceImageToUpload.getDownloadURL();
+                        Map<String, dynamic> dataToSend = {
+                          'condition': condition,
+                          'confidence': confidence,
+                          'imageUrl': imageUrl,
+                        };
+                        await _reference.add(dataToSend).then(
+                            (DocumentReference doc) =>
+                                print("document snapshot"));
+                      } catch (error) {}
+
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Record Saved'),
+                            actions: <Widget>[
+                              ElevatedButton(
+                                child: Text('OK'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.brown[900],
                       padding:
