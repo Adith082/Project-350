@@ -23,29 +23,90 @@ class _ModelChoiceUserState extends State<ModelChoiceUser> {
   var _count1 = 0;
   var _count2 = 0;
   bool likeModel2 = false;
-
-  void initState() {
+  Future initInit() async {
     // showAlert(context);
     // super.initState();
     // print(widget.user.uid);
     // AlertDialog(title: Text("Sample Alert Dialog"));
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection("model1likecount")
         .doc("lLSCaLxWrIZnUB2B1LYL")
         .get()
         .then((DocumentSnapshot doc) {
       final data = doc.data() as Map<String, dynamic>;
-      _count1 = data["model1"];
+      setState(() {
+        _count1 = data["model1"];
+      });
     });
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection("model2likecount")
         .doc("NgnrwiZLdK6oHHzq4h1F")
         .get()
-        .then((DocumentSnapshot doc) {
-      final data = doc.data() as Map<String, dynamic>;
-      _count2 = data["model2"];
+        .then((DocumentSnapshot doc) async {
+      final data = await doc.data() as Map<String, dynamic>;
+      setState(() {
+        _count2 = data["model2"];
+      });
     });
+    print(
+        "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhddddddddddddddddddddddddddddddddd");
+    await FirebaseFirestore.instance
+        .collection(widget.user.uid)
+        .doc(widget.user.uid + "model1")
+        .get()
+        .then((value) async {
+      if (value.exists) {
+        await FirebaseFirestore.instance
+            .collection(widget.user.uid)
+            .doc(widget.user.uid + "model1")
+            .get()
+            .then((DocumentSnapshot doc) async {
+          final data = await doc.data() as Map<String, dynamic>;
+          setState(() {
+            likeModel1 = data["modelbool1"];
+          });
+        });
+      } else {
+        print("WHYYYYYY ARE YOU NOT SHOWING OUT PUUUUUUUUUUUUT");
+        final modelbool1 = <String, dynamic>{"modelbool1": false};
+        await FirebaseFirestore.instance
+            .collection(widget.user.uid)
+            .doc(widget.user.uid + "model1")
+            .set(modelbool1)
+            .onError((e, _) => print("Error writing document: $e"));
+      }
+    });
+
+    await FirebaseFirestore.instance
+        .collection(widget.user.uid)
+        .doc(widget.user.uid + "model2")
+        .get()
+        .then((value) async {
+      if (value.exists) {
+        await FirebaseFirestore.instance
+            .collection(widget.user.uid)
+            .doc(widget.user.uid + "model2")
+            .get()
+            .then((DocumentSnapshot doc) async {
+          final data = await doc.data() as Map<String, dynamic>;
+          setState(() {
+            likeModel2 = data["modelbool2"];
+          });
+        });
+      } else {
+        final modelbool2 = <String, dynamic>{"modelbool2": false};
+        await FirebaseFirestore.instance
+            .collection(widget.user.uid)
+            .doc(widget.user.uid + "model2")
+            .set(modelbool2)
+            .onError((e, _) => print("Error writing document: $e"));
+      }
+    });
+  }
+
+  void initState() {
+    initInit();
   }
 
   Future signOut() async {
@@ -92,7 +153,7 @@ class _ModelChoiceUserState extends State<ModelChoiceUser> {
             ),*/
             child: Text("Choose a detector",
                 style: TextStyle(fontSize: 35, color: Colors.black)),
-            margin: const EdgeInsets.fromLTRB(45, 0, 0, 0),
+            margin: const EdgeInsets.fromLTRB(45, 0, 20, 0),
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(border: Border.all(color: Colors.black)),
           ),
@@ -149,6 +210,24 @@ class _ModelChoiceUserState extends State<ModelChoiceUser> {
                     setState(() {
                       likeModel1 = !likeModel1;
                       _count1 += likeModel1 ? 1 : -1;
+
+                      final mcount1 = <String, dynamic>{"model1": _count1};
+                      final likeflag1 = <String, dynamic>{
+                        "modelbool1": likeModel1
+                      };
+                      FirebaseFirestore.instance
+                          .collection("model1likecount")
+                          .doc("lLSCaLxWrIZnUB2B1LYL")
+                          .set(mcount1)
+                          .onError(
+                              (e, _) => print("Error writing document: $e"));
+
+                      FirebaseFirestore.instance
+                          .collection(widget.user.uid)
+                          .doc(widget.user.uid + "model1")
+                          .set(likeflag1)
+                          .onError(
+                              (e, _) => print("Error writing document: $e"));
                     });
                   },
                 ),
@@ -207,6 +286,24 @@ class _ModelChoiceUserState extends State<ModelChoiceUser> {
                     setState(() {
                       likeModel2 = !likeModel2;
                       _count2 += likeModel2 ? 1 : -1;
+
+                      final mcount2 = <String, dynamic>{"model2": _count2};
+                      final likeflag2 = <String, dynamic>{
+                        "modelbool2": likeModel2
+                      };
+                      FirebaseFirestore.instance
+                          .collection("model2likecount")
+                          .doc("NgnrwiZLdK6oHHzq4h1F")
+                          .set(mcount2)
+                          .onError(
+                              (e, _) => print("Error writing document: $e"));
+
+                      FirebaseFirestore.instance
+                          .collection(widget.user.uid)
+                          .doc(widget.user.uid + "model2")
+                          .set(likeflag2)
+                          .onError(
+                              (e, _) => print("Error writing document: $e"));
                     });
                   },
                 ),
